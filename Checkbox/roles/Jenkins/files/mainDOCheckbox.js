@@ -25,7 +25,7 @@ var client =
 {
 	createDroplet: function (dropletName, region, imageName, onResponse)
 	{
-		var data = 
+		var data =
 		{
 			"name": dropletName,
 			"region":region,
@@ -51,7 +51,7 @@ var client =
 	}
 };
 
-var name = "aapatel8"+os.hostname();
+var name = "checkbox";
 var region = "nyc3"; // Fill one in from #1
 var image = "ubuntu-16-04-x64"; // Fill one in from #2
 var dropletId = "";

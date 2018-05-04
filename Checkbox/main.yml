@@ -27,4 +27,16 @@
     - Checkbox
   become: yes
   gather_facts: no
+
+- name: Create Proxy Droplet
+  hosts:
+    - localhost
+  roles:
+    - Proxy
+
+- name: Create Police Droplet
+  hosts:
+    - localhost
+  roles:
+    - Police
 ...
