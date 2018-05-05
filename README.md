@@ -9,11 +9,13 @@
 
 # Police Monkey
 
-We added a Police Monkey to the project to prevent DoS attacks.
+We added a Police Monkey to the project to prevent DDoS attacks.
 
-## What is DoS attak?
+## What is DDoS attak?
 
 A Denial-of-Service attack (DoS attack) is a cyber-attack in which the perpetrator seeks to make a machine or network resource unavailable to its intended users by temporarily or indefinitely disrupting services of a host connected to the Internet. Denial of service is typically accomplished by flooding the targeted machine or resource with superfluous requests in an attempt to overload systems and prevent some or all legitimate requests from being fulfilled.
+
+In a Distributed Denial-of-Service attack (DDoS attack), the incoming traffic flooding the victim originates from many different sources. This effectively makes it impossible to stop the attack simply by blocking a single source.
 
 ## What is the functionality of Police Monkey?
 
