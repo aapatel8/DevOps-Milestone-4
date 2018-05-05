@@ -6,7 +6,7 @@ var bots = {};
 var targetUrl = 'http://138.197.2.5';
 var captchaAnswer = "4";
 var proxy = httpProxy.createProxyServer({});
-var captchaHtml = '<h3>Enter captcha:</h3><form action="" method="post"><label for="captcha">2+2 = </label><input type="text" name="captcha"><input type="submit" value="Submit"></form>';
+var captchaHtml = '<!DOCTYPE html><head><meta charset="UTF-8"></head><body><h3>Enter captcha:</h3><form action="" method="post"><label for="captcha">2+2 = </label><input type="text" name="captcha"><input type="submit" value="Submit"></form></body></html>';
 
 proxy.on('error', function(e) {
     console.log(`Proxy error: ${e}`);
