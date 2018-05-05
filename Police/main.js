@@ -5,21 +5,29 @@ var users = {};
 var bots = {};
 var targetUrl = 'http://138.197.2.5';
 var captchaAnswer = "4";
-//var proxy = httpProxy.createProxyServer({ target : `${targetServerIp}` });
 var proxy = httpProxy.createProxyServer({});
 var captchaHtml = '<h3>Enter captcha:</h3><form action="" method="post"><label for="captcha">2+2 = </label><input type="text" name="captcha"><input type="submit" value="Submit"></form>';
+
+proxy.on('error', function(e) {
+    console.log(`Proxy error: ${e}`);
+});
 
 let server = http.createServer(function(req,res) {
     const ip = req.socket.remoteAddress;
 
-    proxy.web(req, res, { target: targetUrl });
+    //proxy.web(req, res, { target: targetUrl });
     //proxy.web(req, res, {target: 'http://138.197.2.5:80' });
+
+    if ( users[ip] ) {
+				console.log(`Redirection to Checkbox ${ip} is not a bot`);
+        proxy.web(req, res, {target: targetUrl });
+    } else if ( bots[ip] ) {
+				console.log(`Bot detected: ${ip}`);
+    }
 
     if ( req.method == 'GET' ) {
         res.end(captchaHtml);
-    }
-    
-    if ( req.method == 'POST' ) {
+    } else if ( req.method == 'POST' ) {
         var postData = '';
         req.on('data', function(data) {
             postData += data;
@@ -31,11 +39,13 @@ let server = http.createServer(function(req,res) {
 
             if ( value === captchaAnswer ) {
                 console.log("Captcha was correct");
-                res.end();
-                proxy.web(req, res, {target: 'http://127.0.0.1:8080' });
-                console.log("After redirect");
                 //res.end();
+								users[ip] = 1;
+                proxy.web(req, res, {target: targetUrl });
+                console.log("After redirect");
+                res.end();
             } else {
+								bots[ip] = 1;
                 res.end(captchaHtml);
             }
         });
