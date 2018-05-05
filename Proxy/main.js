@@ -37,7 +37,7 @@ if (flag == 0) {
   }
   else {
      console.log("Redirected to our police server")
-     targetUrl = 'http://52.34.244.167:8000';
+     targetUrl = 'http://104.236.242.30:8080';
   }
   
 proxy.web(req, res, { target: targetUrl });
