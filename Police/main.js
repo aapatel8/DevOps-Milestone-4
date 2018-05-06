@@ -10,7 +10,7 @@ var targetUrl = 'http://138.197.2.5';
 
 var maxFailures = 3;
 var blockTime = 10;     // seconds
-var captchaExpTime = 5; // seconds
+var captchaExpTime = 15; // seconds
 
 var htmlHeader = '<!DOCTYPE html><head><meta charset="UTF-8"></head><body>';
 var htmlFooter = '</body></html>';
