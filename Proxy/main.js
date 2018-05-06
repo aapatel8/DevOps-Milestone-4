@@ -2,6 +2,7 @@ var http = require('http'),
     httpProxy = require('http-proxy');
 var url = require( "url"); 
 var proxy = httpProxy.createProxyServer({});
+var redis = require('redis')
 
 var ip;
 var flag = 0;

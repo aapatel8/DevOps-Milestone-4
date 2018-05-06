@@ -13,6 +13,7 @@
     "http": "",
     "http-proxy": "",
     "url": "",
-    "querystring": ""
+    "querystring": "",
+    "redis": "^0.12.1"
   }
 }

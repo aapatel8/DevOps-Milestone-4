@@ -14,4 +14,12 @@
 
   - name: Wait for SSH connection
     local_action: wait_for host={{ new_droplet.droplet.ip_address }} port=22 delay=60 timeout=320 state=started
+
+  - name: set inventory file
+    lineinfile:
+      path: "{{playbook_dir}}/inventory"
+      line: "[proxy]\nproxy ansible_host={{ new_droplet.droplet.ip_address }} ansible_ssh_user=root ansible_ssh_private_key_file=~/.ssh/id_rsa\n"
+
+  - name: Wait for SSH connection
+    local_action: wait_for host={{ new_droplet.droplet.ip_address }} port=22 delay=60 timeout=320 state=started
 ...
