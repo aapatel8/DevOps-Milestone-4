@@ -6,7 +6,7 @@ var http = require('http'),
 var client = redis.createClient(6379, '127.0.0.1', {});
 var proxy = httpProxy.createProxyServer({});
 
-var targetUrl = 'http://138.197.2.5';
+var targetUrl = 'http://138.197.73.154';
 
 var maxFailures = 3;
 var blockTime = 10;     // seconds
@@ -14,6 +14,10 @@ var captchaExpTime = 15; // seconds
 
 var htmlHeader = '<!DOCTYPE html><head><meta charset="UTF-8"></head><body>';
 var htmlFooter = '</body></html>';
+
+client.flushdb( function (err, succeeded) {
+    console.log(succeeded); // will be true if successfull
+});
 
 /* Sets up the captcha html page */
 function getCaptchaHtml(ip) {
@@ -91,7 +95,7 @@ let server = http.createServer(function(req,res) {
                                 // Captcha was correct
                                 //console.log('value was correct');
                                 client.set(ip, 0);
-                                res.writeHead(302, {'Location': targetUrl + req.url});
+                                res.writeHead(301, {'Location': targetUrl + req.url});
                                 res.end();
                             } else {
                                 // Captcha was incorrect
