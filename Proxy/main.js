@@ -34,11 +34,11 @@ calculate();
 
 if (flag == 0) {
      console.log("Redirected to the main Checkbox.io server")
-     targetUrl = 'http://138.197.2.5';
+     targetUrl = 'http://138.197.73.154';
   }
   else {
      console.log("Redirected to our police server")
-     targetUrl = 'http://104.236.242.30:8080';
+     targetUrl = 'http://159.65.174.84:8080';
   }
   
 proxy.web(req, res, { target: targetUrl });
