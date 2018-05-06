@@ -1,81 +1,117 @@
 var http = require('http'),
     httpProxy = require('http-proxy'),
-    redis = require('redis');
-
-var users = {};
-var bots = {};
+    redis = require('redis'),
+    svgCaptcha = require('svg-captcha');
 
 var client = redis.createClient(6379, '127.0.0.1', {});
+var proxy = httpProxy.createProxyServer({});
+
 var targetUrl = 'http://138.197.2.5';
-var captchaAnswer = "4";
+
 var maxFailures = 3;
 var blockTime = 10;     // seconds
-var proxy = httpProxy.createProxyServer({});
-var captchaHtml = '<!DOCTYPE html><head><meta charset="UTF-8"></head><body><h3>Enter captcha:</h3><form action="" method="post"><label for="captcha">2+2 = </label><input type="text" name="captcha"><input type="submit" value="Submit"></form></body></html>';
+var captchaExpTime = 5; // seconds
+
+var htmlHeader = '<!DOCTYPE html><head><meta charset="UTF-8"></head><body>';
+var htmlFooter = '</body></html>';
+
+/* Sets up the captcha html page */
+function getCaptchaHtml(ip) {
+    var captchaKey = `${ip}_captcha`;
+    var captcha = svgCaptcha.create();
+    var htmlBody = '<h3>Enter captcha:</h3><form action="" method="post"><label for="captcha">' + captcha.data + '</label><br><input type="text" name="captcha"><input type="submit" value="Submit"></form>';
+    
+    //console.log(`Setting captcha key ${captchaKey} text to: ${captcha.text}`);
+    client.set(captchaKey, captcha.text, 'EX', captchaExpTime);
+
+    return htmlHeader + htmlBody + htmlFooter;
+}
 
 let server = http.createServer(function(req,res) {
     var ip = req.socket.remoteAddress;
 
+    // Clean ip
     if (ip.substr(0, 7) == "::ffff:") {
         ip = ip.substr(7);
+    } else if (ip === "::1") {
+        ip = "localhost";
     }
-    
-    client.get(ip, function (err, reply) {
+    //console.log(`ip: ${ip}`);
+
+    // Check cache for key and perform police logic
+    client.get(ip, function (err, ipCnt) {
         if (err) { 
             console.log(`Redis error: ${err}`) ;
         } else {
-            if ( reply == null ) {
-                console.log('Reply is null');
+
+            if ( ipCnt == null ) {
+                // clients first interaction with server
                 client.set(ip, -1);
-                reply = -1;
+                ipCnt = -1;
             } else {
-                reply = parseInt(reply);
+                // get previous client count
+                ipCnt = parseInt(ipCnt);
             }
-            console.log(`Redis reply: ${reply}`);
+            
+            //console.log(`Redis ipCnt: ${ipCnt}`);
            
-            if ( reply == 0 ) {
+            if ( ipCnt == 0 ) {
+                // Ip has been verified to not be bot
+                
                 console.log(`Redirection to Checkbox, ${ip} is not a bot`);
                 proxy.web(req, res, {target: targetUrl });
-            } else if ( reply >= maxFailures ) {
+
+            } else if ( ipCnt >= maxFailures ) {
+                // Ip has been identified as a bot
+                
                 console.log(`Bot detected: ${ip}`);
-                res.end(captchaHtml);
+                res.end(getCaptchaHtml(ip));
+
             } else {
                 if ( req.method == 'GET' ) {
-                    res.end(captchaHtml);
+                    // Send first captcha request form
+                    res.end(getCaptchaHtml(ip));
                 } else if ( req.method == 'POST' ) {
                     var postData = '';
                     req.on('data', function(data) {
+                        // Getting user captcha form submission
                         postData += data;
                     });
 
                     req.on('end', function() {
-                        var key = "captcha=";
-                        var value = postData.slice(key.length, postData.length);
-                        //console.log(`PostData: ${value}`);
+                        var postCaptchaKey = "captcha=";
+                        var userCaptchaValue = postData.slice(postCaptchaKey.length, postData.length);
+                        
+                        var captchaKey = `${ip}_captcha`;
+                        client.get(captchaKey, function (err, captchaValue) {
 
-                        if ( value === captchaAnswer ) {
-                            client.set(ip, 0);
+                            //console.log(`captchaKey value: ${captchaValue}`);
 
-                            res.writeHead(302, {'Location': targetUrl + req.url});
-                            res.end();
-                        } else {
-                            if ( reply < 1 ) { 
-                                client.set(ip, 1);
-                            } else if ( (reply + 1) == maxFailures ) {
-                                console.log('Setting key/value to expire');
-                                client.set(ip, maxFailures, 'EX', blockTime);
+                            if ( userCaptchaValue === captchaValue ) {
+                                // Captcha was correct
+                                //console.log('value was correct');
+                                client.set(ip, 0);
+                                res.writeHead(302, {'Location': targetUrl + req.url});
+                                res.end();
                             } else {
-                                client.set(ip, reply + 1);
+                                // Captcha was incorrect
+                                //console.log('value was incorrect');
+                                if ( ipCnt < 1 ) { 
+                                    client.set(ip, 1);
+                                } else if ( (ipCnt + 1) == maxFailures ) {
+                                    console.log(`ipCnt max failure hit for ip: ${ip}`);
+                                    client.set(ip, maxFailures, 'EX', blockTime);
+                                } else {
+                                    client.set(ip, ipCnt + 1);
+                                }
+                                res.end(getCaptchaHtml(ip));
                             }
-                            res.end(captchaHtml);
-                        }
+                        });
                     });
                 }
             }
         }
     });
-    console.log(`Request IP: ${ip}`);
-
 }).listen(8080);
 
 console.log("Starting server on 8080");
