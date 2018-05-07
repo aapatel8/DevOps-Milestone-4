@@ -1,11 +1,11 @@
 # csc519-cm-special
 
 | Team Member   | Unity ID | Contributions |
-| ------------- | ----------- |
+| ------------- | ----------- | -------------------------------------------------------- |
 | Seth Butler      | scbutle2 |  Worked on the script for Police Monkey. |
 | Akshit Patel     | aapatel8 | Worked on refining the deployment pipeline. Helped with proxy and Police Monkey. Created screencast. |
-| Kunal Kulkarni | krkulkar |   Worked on the script for the proxy.
-| Rezvan Mahdavi Hezaveh  |  rmahdav | Worked on creating the powerpoint for demo and helped with Police Monkey.
+| Kunal Kulkarni | krkulkar |   Worked on the script for the proxy. |
+| Rezvan Mahdavi Hezaveh  |  rmahdav | Worked on creating the powerpoint for demo and helped with Police Monkey. |
 
 ## What is DDoS attack?
 
