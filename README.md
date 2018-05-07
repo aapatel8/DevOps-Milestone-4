@@ -17,7 +17,7 @@ In a Distributed Denial-of-Service attack (DDoS attack), the incoming traffic fl
 
 The architecture of the system is as follows:
 
-![police monkey](https://media.github.ncsu.edu/user/8135/files/434c57ea-4fea-11e8-8ebc-d9dfd3b79e05)
+![police monkey](https://media.github.ncsu.edu/user/2118/files/69cad116-5144-11e8-900e-139a10174f2c)
 
 The Proxy check the source IP address of the recieved request, and if the number of requests of that IP is less that threshold, the proxy sends the request to the main checkbox.io server. In the case that the number of requests of that IP is more that threshold, the proxy sends the request to the Police Monkey.
 
